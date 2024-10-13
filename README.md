@@ -6,6 +6,9 @@
 Блокировка роли происходит путём удаления игрока из отряда (роль в таком случае сбрасывается)
 
 **Работоспособность проверена на версии SquadJS 4.1.0**
+![Screenshot_10](https://github.com/user-attachments/assets/97f94820-555e-4635-9fd8-cbdf1e71cbe5)
+
+![Screenshot_11](https://github.com/user-attachments/assets/be61deb1-b67f-4a08-94a7-f88d201efb3e)
 
 # Основные фишки
 
