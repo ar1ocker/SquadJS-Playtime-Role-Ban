@@ -28,7 +28,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
         description: 'Список ролей которые должны быть забанены',
         default: [
           {
-            roleRegex: '.*pilot.*', // Regex на название роли
+            roleRegex: '.*Pilot.*', // Regex на название роли
             timePlayed: 1500, // Количество времени в часах до которого будет забанена роль
             description: 'Вертолетчик' // Описание роли которое выводится пользователю
           }
