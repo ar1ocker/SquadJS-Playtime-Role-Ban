@@ -1,5 +1,56 @@
-# ⭐ Пригодилось - поставь звездочку ⭐
+# ⭐ If it's useful, give it a star ⭐
 # SquadJS-Playtime-Role-Ban
+
+# English
+
+A script for SquadJS, whose task is to block a role for a player if his total time in the game is less than the time required for the role
+
+Role blocking is performed by removing a player from the squad (the role is reset in this case).
+
+**Proven on SquadJS 4.1.0**
+
+## Main features
+
+- Query total time of players via Steam API
+- Blocking unlimited number of roles by time in the game via regular expressions of any complexity
+- Blocking squad leader until a certain time in the game 
+- Work starting from the set threshold of players on the server
+- Showing blocked roles to the player when logging into the server and via the **!blocked** command (by default).
+- Manual update of player's time via **!update** (default), in case the player opened his profile while on the server.
+- Show player's total time in the game when logging in to the server
+
+## Installation 
+
+- Download the repository 
+
+```
+git clone https://github.com/ar1ocker/SquadJS-Playtime-Role-Ban
+```
+- Apply the new-emit.patch while in the ``<path to squadjs on the server>/`` folder.
+
+```
+git apply <path to patch file> --verbose
+```
+
+Install the y18n library in Squadjs.
+
+```
+npm install y18n
+```
+
+## Settings
+
+Basically similar to any other plugin for SquadJS, but you will need a steam API key to get the game time of users who log in to the server.
+
+**STEAM KEY IS BEST TAKEN FROM AN EMPTY ACCOUNT, THE KEY HAS TOO MANY PERMISSIONS, IF STOLEN IT WILL BE A NUISANCE**.
+
+**Steam allows you to get API key only for accounts that have 5 euros on their account or the total price of games - 5 euros**.
+
+You can get API key at [steam dev](https://steamcommunity.com/dev/apikey).
+
+If the user has hidden his time in the game - the script will ask to open the profile
+
+# Russian
 
 ![Screenshot_10](https://github.com/user-attachments/assets/97f94820-555e-4635-9fd8-cbdf1e71cbe5)
 
@@ -11,7 +62,7 @@
 
 **Работоспособность проверена на версии SquadJS 4.1.0**
 
-# Основные фишки
+## Основные фишки
 
 - Запрос суммарного времени игроков через API Steam
 - Блокировка неограниченного количества ролей по времени в игре через регулярные выражения любой сложности
@@ -21,7 +72,7 @@
 - Ручное обновление времени игрока через команду **!update** (по умолчанию), на случай если игрок открыл свой профиль находясь на сервере
 - Показ игроку его суммарного времени в игре при входе на сервер
 
-# Установка 
+## Установка 
 
 - Скачайте репозиторий 
 
@@ -34,7 +85,13 @@ git clone https://github.com/ar1ocker/SquadJS-Playtime-Role-Ban
 git apply <путь до файла patch> --verbose
 ```
 
-# Настройка
+Установите библиотеку y18n в Squadjs
+
+```
+npm install y18n
+```
+
+## Настройка
 
 В основном аналогична любым другим плагинам для SquadJS, но вам нужен будет API ключ от аккаунта steam, чтобы получать время игры пользователей которые заходят на сервер.
 
