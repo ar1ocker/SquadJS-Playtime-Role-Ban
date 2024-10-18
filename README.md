@@ -38,9 +38,13 @@ Install the y18n library in Squadjs.
 npm install y18n
 ```
 
+Copy the `playtime-role-ban.js` plugin and the `playtime-role-ban-locales` folder to the `squadjs/squad-server/plugins` folder
+
 ## Settings
 
 Basically similar to any other plugin for SquadJS, but you will need a steam API key to get the game time of users who log in to the server.
+
+The plugin language is configured via the config parameter - language
 
 **STEAM KEY IS BEST TAKEN FROM AN EMPTY ACCOUNT, THE KEY HAS TOO MANY PERMISSIONS, IF STOLEN IT WILL BE A NUISANCE**.
 
@@ -91,9 +95,13 @@ git apply <путь до файла patch> --verbose
 npm install y18n
 ```
 
+Скопируйте плагин `playtime-role-ban.js` и папку `playtime-role-ban-locales` в папку `squadjs/squad-server/plugins`
+
 ## Настройка
 
 В основном аналогична любым другим плагинам для SquadJS, но вам нужен будет API ключ от аккаунта steam, чтобы получать время игры пользователей которые заходят на сервер.
+
+Настройка языка плагина осуществляется через параметр конфига - language, русский язык тоже доступен
 
 **КЛЮЧ ОТ АККАУНТА STEAM ЛУЧШЕ БРАТЬ ОТ ПУСТОГО АККАУНТА, КЛЮЧ ИМЕЕТ СЛИШКОМ МНОГО ПРАВ, ЕСЛИ УКРАДУТ - БУДЕТ НЕПРИЯТНО**
 
