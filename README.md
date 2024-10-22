@@ -7,7 +7,7 @@ A script for SquadJS, whose task is to block a role for a player if his total ti
 
 Role blocking is performed by removing a player from the squad (the role is reset in this case).
 
-**Proven on SquadJS 4.1.0**
+**Tested on SquadJS 4.1.0**
 
 ## Main features
 
