@@ -38,7 +38,7 @@ Install the y18n library in Squadjs.
 npm install y18n
 ```
 
-Copy the `playtime-role-ban.js` plugin and the `playtime-role-ban-locales` folder to the `squadjs/squad-server/plugins` folder
+Copy the `playtime-role-ban.js` plugin, `playtime-searcher.js` module and the `playtime-role-ban-locales` folder to the `squadjs/squad-server/plugins` folder
 
 ## Settings
 
@@ -95,7 +95,7 @@ git apply <путь до файла patch> --verbose
 npm install y18n
 ```
 
-Скопируйте плагин `playtime-role-ban.js` и папку `playtime-role-ban-locales` в папку `squadjs/squad-server/plugins`
+Скопируйте плагин `playtime-role-ban.js`, `playtime-searcher.js` модуль и папку `playtime-role-ban-locales` в папку `squadjs/squad-server/plugins`
 
 ## Настройка
 
