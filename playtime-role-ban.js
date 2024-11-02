@@ -313,6 +313,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
   async removePlayerFromSquadForRole(blockedRole, playerSteamID) {
     const player = await this.server.getPlayerBySteamID(playerSteamID);
 
+    if (!player) {
+      return;
+    }
+
     // Вторая проверка текущей роли перед самим киком из отряда
     if (this.checkRole(player.role, blockedRole.roleRegex)) {
       await this.warn(
@@ -332,6 +336,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
   async removePlayerFromSquadForSquadLeader(playerSteamID) {
     const player = await this.server.getPlayerBySteamID(playerSteamID);
+
+    if (!player) {
+      return;
+    }
 
     // Вторая проверка наличия isLeader перед киком из отряда
     if (player.isLeader) {
