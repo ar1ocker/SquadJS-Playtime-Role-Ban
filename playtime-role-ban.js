@@ -106,6 +106,11 @@ export default class PlaytimeRoleBan extends BasePlugin {
         description: "The time between messages with information about banned roles",
         default: 5,
       },
+      frequency_leaders_check: {
+        required: false,
+        description: "The time between squad leaders checks",
+        default: 20,
+      },
       update_playtime_command: {
         required: false,
         description: "The command to update the player`s time",
@@ -143,31 +148,39 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
   async mount() {
     this.server.on(`CHAT_COMMAND:${this.options.update_playtime_command.toLowerCase()}`, async (data) => {
-      await this.getPlayerPlaytime(data.player.steamID, true);
-      await this.showUserPlaytime(data.player.steamID);
+      if (data.player) {
+        await this.getPlayerPlaytime(data.player.steamID, true);
+        await this.showUserPlaytime(data.player.steamID);
+      }
     });
 
     this.server.on(`CHAT_COMMAND:${this.options.show_blocked_roles_command.toLowerCase()}`, async (data) => {
-      await this.getPlayerPlaytime(data.player.steamID, true);
-      await this.showUserBlockedRoles(data.player.steamID);
+      if (data.player) {
+        await this.getPlayerPlaytime(data.player.steamID, true);
+        await this.showUserBlockedRoles(data.player.steamID);
+      }
     });
 
     this.server.on("PLAYER_CONNECTED", async (data) => {
-      await this.getPlayerPlaytime(data.player.steamID, true);
+      if (data.player) {
+        await this.getPlayerPlaytime(data.player.steamID, true);
+      }
     });
 
     if (this.options.show_users_their_time_on_connected) {
       this.server.on("PLAYER_CONNECTED", (data) => {
-        setTimeout(
-          () => this.showUserPlaytime(data.player.steamID),
-          this.options.delay_to_show_time_on_connected * 1000
-        );
+        if (data.player) {
+          setTimeout(
+            () => this.showUserPlaytime(data.player.steamID),
+            this.options.delay_to_show_time_on_connected * 1000
+          );
+        }
       });
     }
 
     if (this.options.show_users_their_blocked_roles) {
       this.server.on("PLAYER_CONNECTED", (data) => {
-        if (this.server.players.length >= this.options.min_number_of_players_for_work) {
+        if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
           setTimeout(
             () => this.showUserBlockedRoles(data.player.steamID),
             this.options.delay_to_show_blocked_roles_on_connected * 1000
@@ -177,28 +190,40 @@ export default class PlaytimeRoleBan extends BasePlugin {
     }
 
     this.server.on("PLAYER_ROLE_CHANGE", (data) => {
-      if (this.server.players.length >= this.options.min_number_of_players_for_work) {
-        this.verifyPlayerRole(data);
+      if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
+        this.verifyPlayerRole(data.player);
       }
     });
 
     this.server.on("PLAYER_POSSESS", (data) => {
-      if (this.server.players.length >= this.options.min_number_of_players_for_work) {
-        this.verifyPlayerRole(data);
+      if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
+        this.verifyPlayerRole(data.player);
       }
     });
 
     this.server.on("PLAYER_NOW_IS_LEADER", (data) => {
-      if (this.server.players.length >= this.options.min_number_of_players_for_work) {
-        this.verifyPlayerSquadLeader(data);
+      if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
+        this.verifyPlayerSquadLeader(data.player);
       }
     });
+
+    setInterval(() => {
+      for (player in this.players) {
+        if (!player) {
+          return;
+        }
+
+        if (player.isLeader) {
+          this.verifyPlayerSquadLeader(player);
+        }
+      }
+    }, this.options.frequency_leaders_check * 1000);
 
     this.verbose(1, this.locale`Plugin has been installed`);
   }
 
-  async verifyPlayerRole(playerRoleData) {
-    const playerPlaytime = await this.getPlayerPlaytime(playerRoleData.player.steamID);
+  async verifyPlayerRole(player) {
+    const playerPlaytime = await this.getPlayerPlaytime(player.steamID);
 
     const allBlockedRoles = this.getBlockedRoles(playerPlaytime);
 
@@ -206,18 +231,17 @@ export default class PlaytimeRoleBan extends BasePlugin {
       this.verbose(
         1,
         this
-          .locale`Player ${playerRoleData.player.steamID} has more playtime than all blocked roles: ${playerPlaytime} hours, plays the allowed role ${playerRoleData.player.role}`
+          .locale`Player ${player.steamID} has more playtime than all blocked roles: ${playerPlaytime} hours, plays the allowed role ${player.role}`
       );
       return;
     }
 
-    const blockedRole = this.searchRoleInList(playerRoleData.player.role, allBlockedRoles);
+    const blockedRole = this.searchRoleInList(player.role, allBlockedRoles);
 
     if (blockedRole === undefined) {
       this.verbose(
         1,
-        this
-          .locale`Player ${playerRoleData.player.steamID} with playtime ${playerPlaytime} plays the allowed role ${playerRoleData.player.role}`
+        this.locale`Player ${player.steamID} with playtime ${playerPlaytime} plays the allowed role ${player.role}`
       );
       return;
     }
@@ -225,16 +249,16 @@ export default class PlaytimeRoleBan extends BasePlugin {
     this.verbose(
       1,
       this
-        .locale`Player ${playerRoleData.player.steamID} with playtime ${playerPlaytime} and role ${playerRoleData.player.role} matching the ${blockedRole.description} filter has been detected, the process of removing him from the squad has been started`
+        .locale`Player ${player.steamID} with playtime ${playerPlaytime} and role ${player.role} matching the ${blockedRole.description} filter has been detected, the process of removing him from the squad has been started`
     );
 
     if (playerPlaytime === TIME_IS_UNKNOWN) {
-      await this.warn_user_about_unknown_playtime(playerRoleData.player.steamID);
+      await this.warn_user_about_unknown_playtime(player.steamID);
     }
 
     if (!this.options.whether_to_remove_a_player_from_squad) {
       await this.warn(
-        playerRoleData.player.steamID,
+        player.steamID,
         this
           .locale`Role (${blockedRole.description}) is blocked until ${blockedRole.timePlayed} playtime, TAKE ANOTHER ONE.`,
         this.options.count_of_ban_role_messages,
@@ -245,14 +269,14 @@ export default class PlaytimeRoleBan extends BasePlugin {
     }
 
     setTimeout(
-      () => this.removePlayerFromSquadForRole(blockedRole, playerRoleData.player.steamID),
+      () => this.removePlayerFromSquadForRole(blockedRole, player.steamID),
       this.options.delay_before_remove_player_from_squad * 1000
     );
 
     await new Promise((resolve) => setTimeout(resolve, 3 * 1000));
 
     await this.warn(
-      playerRoleData.player.steamID,
+      player.steamID,
       this
         .locale`Role (${blockedRole.description}) is blocked until ${blockedRole.timePlayed} playtime, TAKE ANOTHER ONE. ${this.options.delay_before_remove_player_from_squad} seconds.`,
       this.options.count_of_ban_role_messages,
@@ -260,14 +284,14 @@ export default class PlaytimeRoleBan extends BasePlugin {
     );
   }
 
-  async verifyPlayerSquadLeader(playerData) {
-    const playerPlaytime = await this.getPlayerPlaytime(playerData.player.steamID);
+  async verifyPlayerSquadLeader(player) {
+    const playerPlaytime = await this.getPlayerPlaytime(player.steamID);
 
     if (playerPlaytime > this.options.banned_squad_leader_playtime) {
       this.verbose(
         1,
         this
-          .locale`Detected as squad leader ${playerData.player.steamID} with ${playerPlaytime} hours of playtime, squad role is allowed for him for playtime`
+          .locale`Detected as squad leader ${player.steamID} with ${playerPlaytime} hours of playtime, squad role is allowed for him for playtime`
       );
       return;
     }
@@ -275,16 +299,16 @@ export default class PlaytimeRoleBan extends BasePlugin {
     this.verbose(
       1,
       this
-        .locale`Squad leader ${playerData.player.steamID} with playtime ${playerPlaytime} hours has been detected, the process of removing him from the squad leader has been started`
+        .locale`Squad leader ${player.steamID} with playtime ${playerPlaytime} hours has been detected, the process of removing him from the squad leader has been started`
     );
 
     if (playerPlaytime === TIME_IS_UNKNOWN) {
-      await this.warn_user_about_unknown_playtime(playerData.player.steamID);
+      await this.warn_user_about_unknown_playtime(player.steamID);
     }
 
     if (!this.options.whether_to_remove_a_player_from_squad) {
       await this.warn(
-        playerData.player.steamID,
+        player.steamID,
         this
           .locale`You are banned from being a squad leader until ${this.options.banned_squad_leader_playtime} playtime, DISBAND the squad or TRANSFER the role!`,
         this.options.count_of_ban_role_messages,
@@ -295,14 +319,14 @@ export default class PlaytimeRoleBan extends BasePlugin {
     }
 
     setTimeout(
-      () => this.removePlayerFromSquadForSquadLeader(playerData.player.steamID),
+      () => this.removePlayerFromSquadForSquadLeader(player.steamID),
       this.options.delay_before_remove_player_from_squad * 1000
     );
 
     await new Promise((resolve) => setTimeout(resolve, 3 * 1000));
 
     await this.warn(
-      playerData.player.steamID,
+      player.steamID,
       this
         .locale`You are banned from being a squad leader until ${this.options.banned_squad_leader_playtime} playtime, DISBAND the squad or TRANSFER the role! ${this.options.delay_before_remove_player_from_squad} seconds.`,
       this.options.count_of_ban_role_messages,
