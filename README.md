@@ -21,6 +21,14 @@ Role blocking is performed by removing a player from the squad (the role is rese
 
 ## Installation 
 
+- Download the steam playtime searcher
+
+```
+git clone https://github.com/ar1ocker/Steam-Playtime-Searcher
+```
+
+- Copy the `Steam-Playtime-Searcher/playtime-searcher.js` plugin to `squadjs/squad-server/plugins/` folder 
+
 - Download the repository 
 
 ```
@@ -77,6 +85,14 @@ If the user has hidden his time in the game - the script will ask to open the pr
 - Показ игроку его суммарного времени в игре при входе на сервер
 
 ## Установка 
+
+- Скачайте steam playtime searcher
+
+```
+git clone https://github.com/ar1ocker/Steam-Playtime-Searcher
+```
+
+- Скопируйте `Steam-Playtime-Searcher/playtime-searcher.js` плагин в `squadjs/squad-server/plugins/` 
 
 - Скачайте репозиторий 
 
