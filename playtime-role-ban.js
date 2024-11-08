@@ -209,6 +209,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
     setInterval(async () => {
       for (const index in this.server.players) {
+        if (this.server.players.length < this.options.min_number_of_players_for_work) {
+          return;
+        }
+
         if (!this.server.players[index]) {
           return;
         }
