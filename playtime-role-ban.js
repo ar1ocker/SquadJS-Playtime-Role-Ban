@@ -207,14 +207,14 @@ export default class PlaytimeRoleBan extends BasePlugin {
       }
     });
 
-    setInterval(() => {
-      for (player in this.players) {
-        if (!player) {
+    setInterval(async () => {
+      for (const index in this.server.players) {
+        if (!this.server.players[index]) {
           return;
         }
 
-        if (player.isLeader) {
-          this.verifyPlayerSquadLeader(player);
+        if (this.server.players[index].isLeader) {
+          await this.verifyPlayerSquadLeader(this.server.players[index]);
         }
       }
     }, this.options.frequency_leaders_check * 1000);
