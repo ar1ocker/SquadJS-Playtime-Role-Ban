@@ -214,7 +214,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
       for (const player of this.server.players) {
         if (!player) {
-          return;
+          continue;
         }
 
         if (player.isLeader) {
