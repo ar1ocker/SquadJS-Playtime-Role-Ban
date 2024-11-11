@@ -208,17 +208,17 @@ export default class PlaytimeRoleBan extends BasePlugin {
     });
 
     setInterval(async () => {
-      for (const index in this.server.players) {
-        if (this.server.players.length < this.options.min_number_of_players_for_work) {
+      if (this.server.players.length < this.options.min_number_of_players_for_work) {
+        return;
+      }
+
+      for (const player of this.server.players) {
+        if (!player) {
           return;
         }
 
-        if (!this.server.players[index]) {
-          return;
-        }
-
-        if (this.server.players[index].isLeader) {
-          await this.verifyPlayerSquadLeader(this.server.players[index]);
+        if (player.isLeader) {
+          await this.verifyPlayerSquadLeader(player);
         }
       }
     }, this.options.frequency_leaders_check * 1000);
@@ -418,10 +418,8 @@ export default class PlaytimeRoleBan extends BasePlugin {
       );
     }
 
-    for (const index in blockedRoles) {
-      blocked_roles_messages.push(
-        this.locale`Role blocked: ${blockedRoles[index].description} up to ${blockedRoles[index].timePlayed} hours`
-      );
+    for (const role of blockedRoles) {
+      blocked_roles_messages.push(this.locale`Role blocked: ${role.description} up to ${role.timePlayed} hours`);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 3 * 1000));
@@ -463,8 +461,8 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   async warns(playerID, messages, frequency = 5) {
-    for (let index in messages) {
-      await this.server.rcon.warn(playerID, messages[index]);
+    for (const [index, message] of messages.entries()) {
+      await this.server.rcon.warn(playerID, message);
 
       if (index != messages.length - 1) {
         await new Promise((resolve) => setTimeout(resolve, frequency * 1000));

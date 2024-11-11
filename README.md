@@ -1,4 +1,5 @@
 # ⭐ If it's useful, give it a star ⭐
+
 # SquadJS-Playtime-Role-Ban
 
 # English
@@ -13,37 +14,44 @@ Role blocking is performed by removing a player from the squad (the role is rese
 
 - Query total time of players via Steam API
 - Blocking unlimited number of roles by time in the game via regular expressions of any complexity
-- Blocking squad leader until a certain time in the game 
+- Blocking squad leader until a certain time in the game
 - Work starting from the set threshold of players on the server
 - Showing blocked roles to the player when logging into the server and via the **!blocked** command (by default).
 - Manual update of player's time via **!update** (default), in case the player opened his profile while on the server.
 - Show player's total time in the game when logging in to the server
 
-## Installation 
-
-- Download the steam playtime searcher
-
-```
-git clone https://github.com/ar1ocker/Steam-Playtime-Searcher
-```
-
-- Copy the `Steam-Playtime-Searcher/playtime-searcher.js` plugin to `squadjs/squad-server/plugins/` folder 
-
-- Download the repository 
-
-```
-git clone https://github.com/ar1ocker/SquadJS-Playtime-Role-Ban
-```
-- Apply the new-emit.patch while in the ``<path to squadjs on the server>/`` folder.
-
-```
-git apply <path to patch file> --verbose
-```
+## Installation
 
 Install the y18n library in Squadjs.
 
 ```
 npm install y18n
+```
+
+- Download the repository Steam Playtime Searcher
+
+```
+git clone https://github.com/ar1ocker/Steam-Playtime-Searcher
+```
+
+- Copy the `Steam-Playtime-Searcher/playtime-searcher.js` plugin to `squadjs/squad-server/plugins/` folder
+
+- Download the repository SquadJS Random Patches
+
+```
+git clone https://github.com/ar1ocker/SquadJS-Random-Patches
+```
+
+- Apply the new-emit.patch while in the `<path to squadjs on the server>/` folder.
+
+```
+git apply <path to patch file> --verbose
+```
+
+- Download the repository
+
+```
+git clone https://github.com/ar1ocker/SquadJS-Playtime-Role-Ban
 ```
 
 Copy the `playtime-role-ban.js` plugin, `playtime-searcher.js` module and the `playtime-role-ban-locales` folder to the `squadjs/squad-server/plugins` folder
@@ -78,37 +86,44 @@ If the user has hidden his time in the game - the script will ask to open the pr
 
 - Запрос суммарного времени игроков через API Steam
 - Блокировка неограниченного количества ролей по времени в игре через регулярные выражения любой сложности
-- Блокирование лидерства в скваде (squad leader) до определенного времени в игре 
+- Блокирование лидерства в скваде (squad leader) до определенного времени в игре
 - Работа начиная с выставленного порога игроков на сервере
 - Показ игроку заблокированных для него ролей при входе на сервер и через команду **!blocked** (по умолчанию)
 - Ручное обновление времени игрока через команду **!update** (по умолчанию), на случай если игрок открыл свой профиль находясь на сервере
 - Показ игроку его суммарного времени в игре при входе на сервер
 
-## Установка 
+## Установка
 
-- Скачайте steam playtime searcher
+Установите библиотеку y18n в Squadjs
+
+```
+npm install y18n
+```
+
+- Скачайте репозиторий Steam Playtime Searcher
 
 ```
 git clone https://github.com/ar1ocker/Steam-Playtime-Searcher
 ```
 
-- Скопируйте `Steam-Playtime-Searcher/playtime-searcher.js` плагин в `squadjs/squad-server/plugins/` 
+- Скопируйте `Steam-Playtime-Searcher/playtime-searcher.js` плагин в `squadjs/squad-server/plugins/`
 
-- Скачайте репозиторий 
+- Скачайте репозиторий SquadJS Random Patches
 
 ```
-git clone https://github.com/ar1ocker/SquadJS-Playtime-Role-Ban
+git clone https://github.com/ar1ocker/SquadJS-Random-Patches
 ```
+
 - Примените патч new-emit.patch находясь в папке `<путь до squadjs на сервере>/`
 
 ```
 git apply <путь до файла patch> --verbose
 ```
 
-Установите библиотеку y18n в Squadjs
+- Скачайте репозиторий SquadJS Playtime Role Ban
 
 ```
-npm install y18n
+git clone https://github.com/ar1ocker/SquadJS-Playtime-Role-Ban
 ```
 
 Скопируйте плагин `playtime-role-ban.js`, `playtime-searcher.js` модуль и папку `playtime-role-ban-locales` в папку `squadjs/squad-server/plugins`
