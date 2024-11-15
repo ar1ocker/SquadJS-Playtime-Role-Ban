@@ -43,13 +43,18 @@ export default class PlaytimeRoleBan extends BasePlugin {
       },
       whether_to_remove_a_player_from_squad: {
         required: false,
-        description: "Whethener to remove a player from a squad due to banned roles",
+        description: "Whether to remove a player from a squad due to banned roles",
         default: true,
       },
       min_number_of_players_for_work: {
         required: true,
         description: "After how many players does whale blocking start working",
         default: 60,
+      },
+      whether_work_at_seed: {
+        required: false,
+        description: "Whether to work at seed",
+        default: false,
       },
       is_squad_leader_banned: {
         required: false,
@@ -132,6 +137,8 @@ export default class PlaytimeRoleBan extends BasePlugin {
       directory: "./squad-server/plugins/playtime-role-ban-locales",
     }).__;
 
+    this.playersUnderRoleVerify = new Set();
+    this.playersUnderLeaderVerify = new Set();
     this.playtimeAPI = new PlaytimeSearcher(this.options.steam_api_key);
 
     this.showUserPlaytime = this.showUserPlaytime.bind(this);
@@ -180,7 +187,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
     if (this.options.show_users_their_blocked_roles) {
       this.server.on("PLAYER_CONNECTED", (data) => {
-        if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
+        if (this.is_need_to_check() && data.player) {
           setTimeout(
             () => this.showUserBlockedRoles(data.player.steamID),
             this.options.delay_to_show_blocked_roles_on_connected * 1000
@@ -189,26 +196,44 @@ export default class PlaytimeRoleBan extends BasePlugin {
       });
     }
 
-    this.server.on("PLAYER_ROLE_CHANGE", (data) => {
-      if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
-        this.verifyPlayerRole(data.player);
+    this.server.on("PLAYER_ROLE_CHANGE", async (data) => {
+      if (this.is_need_to_check() && data.player) {
+        if (!this.playersUnderRoleVerify.has(data.player.steamID)) {
+          this.playersUnderRoleVerify.add(data.player.steamID);
+          await this.verifyPlayerRole(data.player);
+
+          await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
+          this.playersUnderRoleVerify.delete(data.player.steamID);
+        }
       }
     });
 
-    this.server.on("PLAYER_POSSESS", (data) => {
-      if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
-        this.verifyPlayerRole(data.player);
+    this.server.on("PLAYER_POSSESS", async (data) => {
+      if (this.is_need_to_check() && data.player) {
+        if (!this.playersUnderRoleVerify.has(data.player.steamID)) {
+          this.playersUnderRoleVerify.add(data.player.steamID);
+          await this.verifyPlayerRole(data.player);
+
+          await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
+          this.playersUnderRoleVerify.delete(data.player.steamID);
+        }
       }
     });
 
-    this.server.on("PLAYER_NOW_IS_LEADER", (data) => {
-      if (this.server.players.length >= this.options.min_number_of_players_for_work && data.player) {
-        this.verifyPlayerSquadLeader(data.player);
+    this.server.on("PLAYER_NOW_IS_LEADER", async (data) => {
+      if (this.is_need_to_check() && data.player) {
+        if (!this.playersUnderLeaderVerify.has(data.player.steamID)) {
+          this.playersUnderLeaderVerify.add(data.player.steamID);
+          await this.verifyPlayerSquadLeader(data.player);
+
+          await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
+          this.playersUnderLeaderVerify.delete(data.player.steamID);
+        }
       }
     });
 
     setInterval(async () => {
-      if (this.server.players.length < this.options.min_number_of_players_for_work) {
+      if (!this.is_need_to_check()) {
         return;
       }
 
@@ -218,7 +243,13 @@ export default class PlaytimeRoleBan extends BasePlugin {
         }
 
         if (player.isLeader) {
-          await this.verifyPlayerSquadLeader(player);
+          if (!this.playersUnderLeaderVerify.has(player.steamID)) {
+            this.playersUnderLeaderVerify.add(player.steamID);
+            await this.verifyPlayerSquadLeader(player);
+
+            await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
+            this.playersUnderLeaderVerify.delete(player.steamID);
+          }
         }
       }
     }, this.options.frequency_leaders_check * 1000);
@@ -359,7 +390,12 @@ export default class PlaytimeRoleBan extends BasePlugin {
         1,
         this.locale`Player ${player.steamID} was removed from the squad for the ${blockedRole.description} role`
       );
+    } else {
+      await this.warn(playerSteamID, this.locale`Thanks!`);
     }
+
+    await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
+    this.playersUnderRoleVerify.delete(playerSteamID);
   }
 
   async removePlayerFromSquadForSquadLeader(playerSteamID) {
@@ -376,12 +412,16 @@ export default class PlaytimeRoleBan extends BasePlugin {
         this
           .locale`It is forbidden to be a squad leader until ${this.options.banned_squad_leader_playtime} hours of playtime!`
       );
+
       await this.server.rcon.execute(`AdminRemovePlayerFromSquadById ${player.playerID}`);
 
       this.verbose(1, this.locale`Player ${player.steamID} was removed for being a squad player`);
     } else {
       await this.warn(playerSteamID, this.locale`Thanks!`);
     }
+
+    await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
+    this.playersUnderLeaderVerify.delete(playerSteamID);
   }
 
   async showUserPlaytime(playerSteamID) {
@@ -437,6 +477,14 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
   checkRole(roleName, roleRegex) {
     return roleName.match(roleRegex);
+  }
+
+  is_need_to_check() {
+    const gamemode = this.server?.currentLayer?.gamemode;
+
+    const gamemode_pass = gamemode === undefined || gamemode !== "Seed";
+
+    return this.server.players.length >= this.options.min_number_of_players_for_work && gamemode_pass;
   }
 
   async getPlayerPlaytime(steamID, ignoreCache = false) {
