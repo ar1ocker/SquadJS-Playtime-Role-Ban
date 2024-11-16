@@ -126,6 +126,11 @@ export default class PlaytimeRoleBan extends BasePlugin {
         description: "Command to show blocked roles",
         default: "blocked",
       },
+      whether_to_rename_squad: {
+        required: false,
+        description: "Whether to rename squad when squad leader has small playtime",
+        default: true,
+      },
     };
   }
 
@@ -336,6 +341,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
       this
         .locale`Squad leader ${player.steamID} with playtime ${playerPlaytime} hours has been detected, the process of removing him from the squad leader has been started`
     );
+
+    if (this.options.whether_to_rename_squad) {
+      await this.server.rcon.execute(`AdminRenameSquad ${player.teamID} ${player.squadID}`);
+    }
 
     if (playerPlaytime === TIME_IS_UNKNOWN) {
       await this.warn_user_about_unknown_playtime(player.steamID);
