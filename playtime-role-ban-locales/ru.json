@@ -19,5 +19,6 @@
   "All roles are open for you": "Все роли для вас открыты",
   "Requested %s with errors %s": "Запросы %s с ошибками %s",
   "Role blocked: %s up to %s hours": "Заблокирована роль: %s до %s часов",
-  "Role blocked: Squad Leader up to %s hours": "Заблокирована роль: Сквадной до %s часов"
+  "Role blocked: Squad Leader up to %s hours": "Заблокирована роль: Сквадной до %s часов",
+  "Squad with leader %s, name %s and teamID %s has been renamed": "Сквад со сквадным %s, названием %s и teamID %s был переименован"
 }

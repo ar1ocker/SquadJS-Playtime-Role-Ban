@@ -342,8 +342,17 @@ export default class PlaytimeRoleBan extends BasePlugin {
         .locale`Squad leader ${player.steamID} with playtime ${playerPlaytime} hours has been detected, the process of removing him from the squad leader has been started`
     );
 
+    const updatedPlayer = this.server.getPlayerBySteamID(player.steamID);
+
     if (this.options.whether_to_rename_squad) {
-      await this.server.rcon.execute(`AdminRenameSquad ${player.teamID} ${player.squadID}`);
+      if (updatedPlayer.isLeader && !updatedPlayer.squad?.squadName.startsWith("Squad")) {
+        await this.server.rcon.execute(`AdminRenameSquad ${updatedPlayer.teamID} ${updatedPlayer.squadID}`);
+        this.verbose(
+          1,
+          this
+            .locale`Squad with leader ${updatedPlayer.steamID}, name ${updatedPlayer.squad?.squadName} and teamID ${updatedPlayer.teamID} has been renamed`
+        );
+      }
     }
 
     if (playerPlaytime === TIME_IS_UNKNOWN) {

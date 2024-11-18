@@ -19,5 +19,6 @@
   "All roles are open for you": "All roles are open for you",
   "Requested %s with errors %s": "Requested %s with errors %s",
   "Role blocked: %s up to %s hours": "Role blocked: %s up to %s hours",
-  "Role blocked: Squad Leader up to %s hours": "Role blocked: Squad Leader up to %s hours"
+  "Role blocked: Squad Leader up to %s hours": "Role blocked: Squad Leader up to %s hours",
+  "Squad with leader %s, name %s and teamID %s has been renamed": "Squad with leader %s, name %s and teamID %s has been renamed"
 }
