@@ -20,5 +20,7 @@
   "Requested %s with errors %s": "Requested %s with errors %s",
   "Role blocked: %s up to %s hours": "Role blocked: %s up to %s hours",
   "Role blocked: Squad Leader up to %s hours": "Role blocked: Squad Leader up to %s hours",
-  "Squad with leader %s, name %s and teamID %s has been renamed": "Squad with leader %s, name %s and teamID %s has been renamed"
+  "Squad with leader %s, name %s and teamID %s has been renamed": "Squad with leader %s, name %s and teamID %s has been renamed",
+  "You are banned from being a squad leader until %s playtime": "You are banned from being a squad leader until %s playtime",
+  "Squad %s from team number %s has been disbanded, squad creator steam id %s, playtime %s": "Squad %s from team number %s has been disbanded, squad creator steam id %s, playtime %s"
 }
