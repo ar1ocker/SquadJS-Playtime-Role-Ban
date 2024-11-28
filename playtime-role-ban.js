@@ -229,7 +229,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
     });
 
     this.server.on("PLAYER_NOW_IS_LEADER", async (data) => {
-      if (this.isNeedToCheck() && data.player) {
+      if (this.isNeedToCheck() && this.options.is_squad_leader_banned && data.player) {
         // т.к. PLAYER_NOW_IS_LEADER и SQUAD_CREATED приходят в одно время, а время создания сквада мы не знаем - этот костыль позволяет первоначально проверять SQUAD_CREATED, а потом уже PLAYER_NOW_IS_LEADER
         await new Promise((resolve) => setTimeout(resolve, 300));
         data.player = await this.server.getPlayerBySteamID(data.player.steamID, true);
@@ -248,7 +248,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
     });
 
     setInterval(async () => {
-      if (!this.isNeedToCheck()) {
+      if (!this.isNeedToCheck() || !this.options.is_squad_leader_banned) {
         return;
       }
 
@@ -273,7 +273,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
     if (this.options.whether_to_instant_disband_new_squad) {
       this.server.on("SQUAD_CREATED", async (data) => {
-        if (this.isNeedToCheck() && data.player) {
+        if (this.isNeedToCheck() && this.options.is_squad_leader_banned && data.player) {
           this.newSquadLock.lock(`${data.squadID}${data.teamID}`);
           await this.verifyCreatedSquadLeader(data.player);
           this.newSquadLock.unlock(`${data.squadID}${data.teamID}`);
