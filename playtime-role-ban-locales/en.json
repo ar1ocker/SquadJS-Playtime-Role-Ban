@@ -22,5 +22,10 @@
   "Role blocked: Squad Leader up to %s hours": "Role blocked: Squad Leader up to %s hours",
   "Squad with leader %s, name %s and teamID %s has been renamed": "Squad with leader %s, name %s and teamID %s has been renamed",
   "You are banned from being a squad leader until %s playtime": "You are banned from being a squad leader until %s playtime",
-  "Squad %s from team number %s has been disbanded, squad creator steam id %s, playtime %s": "Squad %s from team number %s has been disbanded, squad creator steam id %s, playtime %s"
+  "Squad %s with name %s from team number %s has been disbanded, squad creator steam id %s, playtime %s": "Squad %s with name %s from team number %s has been disbanded, squad creator steam id %s, playtime %s",
+  "Role blocked: CMD up to %s hours": "Role blocked: CMD up to %s hours",
+  "Detected cmd %s with %s hours, cmd role is allowed for him for playtime": "Detected cmd %s with %s hours, cmd role is allowed for him for playtime",
+  "You are banned from being a CMD until %s playtime": "You are banned from being a CMD until %s playtime",
+  "CMD %s with %s hours has been demoted from commander": "CMD %s with %s hours has been demoted from commander",
+  "Squad created player %s, squad ID %s, teamID %s, name %s": "Squad created player %s, squad ID %s, teamID %s, name %s"
 }

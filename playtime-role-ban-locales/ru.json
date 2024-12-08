@@ -22,5 +22,10 @@
   "Role blocked: Squad Leader up to %s hours": "Роль Сквадной доступна с %s часов",
   "Squad with leader %s, name %s and teamID %s has been renamed": "Сквад со сквадным %s, названием %s и teamID %s был переименован",
   "You are banned from being a squad leader until %s playtime": "Роль сквадного доступна с %s часов игры",
-  "Squad %s from team number %s has been disbanded, squad creator steam id %s, playtime %s": "Сквад %s из команды номер %s был расформирован, steam id создателя сквада %s, игровое время %s"
+  "Squad %s with name %s from team number %s has been disbanded, squad creator steam id %s, playtime %s": "Сквад %s с названием %s из команды номер %s был расформирован, steam id создателя сквада %s, игровое время %s",
+  "Role blocked: CMD up to %s hours": "Роль Командира стороны доступна с %s часов",
+  "Detected cmd %s with %s hours, cmd role is allowed for him for playtime": "Обнаружен cmd %s с %s часов, роль cmd доступна ему по игровому времени",
+  "You are banned from being a CMD until %s playtime": "Роль Командира стороны доступна с %s часов",
+  "CMD %s with %s hours has been demoted from commander": "CMD %s с %s часами снят с должности",
+  "Squad created player %s, squad ID %s, teamID %s": "Создан сквад, игрок %s, id сквада %s, id команды %s, название %s"
 }
