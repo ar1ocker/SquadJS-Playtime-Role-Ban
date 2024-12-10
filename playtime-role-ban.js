@@ -59,6 +59,12 @@ export default class PlaytimeRoleBan extends BasePlugin {
         default: true,
       },
 
+      whitelisted_players: {
+        required: false,
+        description: "The list of players who ignore the rules of the plugin",
+        default: [],
+      },
+
       min_number_of_players_for_work: {
         required: true,
         description: "After how many players does whale blocking start working",
@@ -328,6 +334,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   async verifyPlayerRole(player) {
+    if (this.isIDWhitelisted(player.steamID)) {
+      return;
+    }
+
     const playerPlaytime = await this.getPlayerPlaytime(player.steamID);
 
     const allBlockedRoles = this.getBlockedRoles(playerPlaytime);
@@ -395,6 +405,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   async verifyPlayerSquadLeader(player) {
+    if (this.isIDWhitelisted(player.steamID)) {
+      return;
+    }
+
     const playerPlaytime = await this.getPlayerPlaytime(player.steamID);
 
     if (this.isSquadLeaderAvailable(playerPlaytime)) {
@@ -458,6 +472,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   async verifyCreatedSquadLeader(player) {
+    if (this.isIDWhitelisted(player.steamID)) {
+      return;
+    }
+
     const playerPlaytime = await this.getPlayerPlaytime(player.steamID);
 
     const updatedPlayer = await this.server.getPlayerBySteamID(player.steamID);
@@ -500,6 +518,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
   async verifyPlayerCMD(player) {
     if (player.squad.squadName !== "Command Squad") {
+      return;
+    }
+
+    if (this.isIDWhitelisted(player.steamID)) {
       return;
     }
 
@@ -584,6 +606,11 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   async showUserBlockedRoles(playerSteamID) {
+    if (this.isIDWhitelisted(playerSteamID)) {
+      await this.warn(playerSteamID, this.locale`All roles are open for you`);
+      return;
+    }
+
     const playerPlaytime = await this.getPlayerPlaytime(playerSteamID);
 
     const blockedRoles = this.getBlockedRoles(playerPlaytime);
@@ -601,13 +628,13 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
     let blockedRolesMessages = [];
 
-    if (this.options.is_squad_leader_banned && playerPlaytime < this.options.banned_squad_leader_playtime) {
+    if (this.options.is_squad_leader_banned && !this.isSquadLeaderAvailable(playerPlaytime)) {
       blockedRolesMessages.push(
         this.locale`Role blocked: Squad Leader up to ${this.options.banned_squad_leader_playtime} hours`
       );
     }
 
-    if (this.options.is_cmd_banned && playerPlaytime < this.options.banned_cmd_playtime) {
+    if (this.options.is_cmd_banned && this.isCMDAvailable(playerPlaytime)) {
       blockedRolesMessages.push(this.locale`Role blocked: CMD up to ${this.options.banned_cmd_playtime} hours`);
     }
 
@@ -622,6 +649,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
 
   isSquadLeaderAvailable(playtime) {
     return playtime !== TIME_IS_UNKNOWN && playtime >= this.options.banned_squad_leader_playtime;
+  }
+
+  isCMDAvailable(playtime) {
+    return playtime !== TIME_IS_UNKNOWN && playtime >= this.options.banned_cmd_playtime;
   }
 
   getBlockedRoles(playtime) {
@@ -642,6 +673,10 @@ export default class PlaytimeRoleBan extends BasePlugin {
     const gamemode_pass = gamemode !== "Seed";
 
     return this.server.players.length >= this.options.min_number_of_players_for_work && gamemode_pass;
+  }
+
+  isIDWhitelisted(id) {
+    return this.options.whitelisted_players.includes(id);
   }
 
   async getPlayerPlaytime(steamID, ignoreCache = false) {
