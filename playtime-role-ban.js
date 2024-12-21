@@ -56,7 +56,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
       is_cmd_banned: {
         required: false,
         description: "Is the role of cmd banned",
-        default: true,
+        default: false,
       },
 
       whitelisted_players: {
