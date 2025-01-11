@@ -56,7 +56,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
       is_cmd_banned: {
         required: false,
         description: "Is the role of cmd banned",
-        default: false,
+        default: true,
       },
 
       whitelisted_players: {
@@ -262,6 +262,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
         await new Promise((resolve) => setTimeout(resolve, 300));
         data.player = await this.server.getPlayerBySteamID(data.player.steamID);
         if (
+          data.player &&
           !this.newSquadLock.isLock(`${data.player.squadID}${data.player.teamID}`) &&
           !this.leaderVerifyLock.isLock(data.player.steamID) &&
           data.player?.isLeader
@@ -490,7 +491,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
       this.verbose(
         1,
         this
-          .locale`Squad ${updatedPlayer.squadID} with name ${String(updatedPlayer?.squad.squadName)} from team number ${updatedPlayer.teamID} has been disbanded, squad creator steam id ${updatedPlayer.steamID}, playtime ${playerPlaytime}`
+          .locale`Squad ${updatedPlayer.squadID} with name ${String(updatedPlayer.squad?.squadName)} from team number ${updatedPlayer.teamID} has been disbanded, squad creator steam id ${updatedPlayer.steamID}, playtime ${playerPlaytime}`
       );
 
       await this.server.rcon.execute(`AdminDisbandSquad ${updatedPlayer.teamID} ${updatedPlayer.squadID}`);
