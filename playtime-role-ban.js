@@ -649,11 +649,11 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   isSquadLeaderAvailable(playtime) {
-    return playtime !== TIME_IS_UNKNOWN && playtime >= this.options.banned_squad_leader_playtime;
+    return playtime >= this.options.banned_squad_leader_playtime;
   }
 
   isCMDAvailable(playtime) {
-    return playtime !== TIME_IS_UNKNOWN && playtime >= this.options.banned_cmd_playtime;
+    return playtime >= this.options.banned_cmd_playtime;
   }
 
   getBlockedRoles(playtime) {
@@ -669,7 +669,7 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   isNeedToCheck() {
-    const gamemode = this.server?.currentLayer?.gamemode;
+    const gamemode = this.server.currentLayer?.gamemode;
 
     const gamemode_pass = gamemode !== "Seed";
 
