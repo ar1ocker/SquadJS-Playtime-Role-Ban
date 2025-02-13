@@ -27,5 +27,8 @@
   "Detected cmd %s with %s hours, cmd role is allowed for him for playtime": "Обнаружен cmd %s с %s часов, роль cmd доступна ему по игровому времени",
   "You are banned from being a CMD until %s playtime": "Роль Командира стороны доступна с %s часов",
   "CMD %s with %s hours has been demoted from commander": "CMD %s с %s часами снят с должности",
-  "Squad created player %s, squad ID %s, teamID %s": "Создан сквад, игрок %s, id сквада %s, id команды %s, название %s"
+  "Squad created player %s, squad ID %s, teamID %s": "Создан сквад, игрок %s, id сквада %s, id команды %s, название %s",
+  "Leader": "Сквадной",
+  "CMD": "CMD",
+  "Last saved total server playtime: %s hours": "Последнее суммарное время сервера: %s часов"
 }
