@@ -1,6 +1,6 @@
 //@ts-check
 import BasePlugin from "./base-plugin.js";
-import { default as PlaytimeSearcher, TIME_IS_UNKNOWN } from "./playtime-searcher.js";
+import { default as PlaytimeServiceAPI, TIME_IS_UNKNOWN } from "./playtime-service-api.js";
 import y18n from "y18n";
 import path from "path";
 import fs from "fs";
@@ -25,9 +25,14 @@ export default class PlaytimeRoleBan extends BasePlugin {
         description: "Locale",
         default: "en",
       },
-      steam_api_key: {
+      playtime_service_api_url: {
         required: true,
-        description: "The API key from the steam user account, which will be used to search for the user`s game time",
+        description: "URL to Playtime Service API",
+        default: "",
+      },
+      playtime_service_api_secret_key: {
+        required: true,
+        description: "Secret key for Playtime Service API",
         default: "",
       },
 
@@ -235,7 +240,11 @@ export default class PlaytimeRoleBan extends BasePlugin {
     this.leaderVerifyLock = new SoftLocking();
     this.newSquadLock = new SoftLocking();
 
-    this.playtimeAPI = new PlaytimeSearcher(this.options.steam_api_key);
+    this.playtimeAPI = new PlaytimeServiceAPI(
+      this.options.playtime_service_api_url,
+      this.options.playtime_service_api_secret_key,
+      SQUAD_GAME_ID
+    );
 
     this.showUserPlaytime = this.showUserPlaytime.bind(this);
     this.verifyPlayerRole = this.verifyPlayerRole.bind(this);
@@ -800,30 +809,32 @@ export default class PlaytimeRoleBan extends BasePlugin {
     return this.options.whitelisted_players.includes(id);
   }
 
-  async getPlayerPlaytime(steamID, ignoreCache = false) {
-    const playtimeObject = await this.playtimeAPI.getPlaytimeByGame(steamID, SQUAD_GAME_ID, ignoreCache);
-
-    if (playtimeObject.errors.length > 0) {
-      this.verbose(1, this.locale`Requested ${steamID} with errors ${playtimeObject.errors.join(", ")}`);
+  async getPlayerPlaytime(steamID, isNeedUpdate = false) {
+    let playtime;
+    try {
+      playtime = await this.playtimeAPI.requestPlaytimeBySteamID(steamID, isNeedUpdate);
+    } catch (error) {
+      this.verbose(1, this.locale`Failed to get playtime for ${steamID} with error: ${error}`);
+      return TIME_IS_UNKNOWN;
     }
 
-    return playtimeObject.playtime;
+    if (playtime.bmPlaytime || playtime.steamPlaytime) {
+      return Math.max(playtime.bmPlaytime, playtime.steamPlaytime) / 60 / 60;
+    }
+
+    return TIME_IS_UNKNOWN;
   }
 
   async getTotalServerPlaytime() {
-    let playtimes = await Promise.all(
-      this.server.players.map(async (player) => {
-        const playtime = await this.getPlayerPlaytime(player.steamID);
-
-        if (playtime === TIME_IS_UNKNOWN) {
-          return 0;
-        }
-
-        return playtime;
-      })
+    let playtimes = await this.playtimeAPI.requestPlaytimesBySteamIDs(
+      this.server.players.map((player) => player.steamID)
     );
 
-    return playtimes.reduce((prev, curr) => prev + curr);
+    let totalPlaytimeSec = playtimes.reduce((prev, curr) => {
+      return prev + Math.max(curr.bmPlaytime, curr.steamPlaytime);
+    }, 0);
+
+    return totalPlaytimeSec / 60 / 60;
   }
 
   async warn(playerID, message, repeat = 1, frequency = 5) {
@@ -934,9 +945,18 @@ class BlockedRoleAbstract {
     this.selectedBlockOption = null;
   }
 
+  /**
+   *
+   * @param {number | any} playtime
+   * @returns {boolean}
+   */
   isPlaytimeValid(playtime) {
     if (!this.selectedBlockOption) {
       return true;
+    }
+
+    if (typeof playtime !== "number") {
+      return false;
     }
 
     if (playtime > this.selectedBlockOption.minPlayerPlaytime) {
@@ -949,7 +969,7 @@ class BlockedRoleAbstract {
   /**
    *
    * @param {object} player
-   * @param {number} playerPlaytime
+   * @param {number | any} playerPlaytime
    */
   // eslint-disable-next-line no-unused-vars
   isPlayerValid(player, playerPlaytime) {}
@@ -959,11 +979,15 @@ class BlockedCMDRole extends BlockedRoleAbstract {
   /**
    *
    * @param {object} player
-   * @param {number} playerPlaytime
+   * @param {number | any} playerPlaytime
    */
   isPlayerValid(player, playerPlaytime) {
     if (!this.selectedBlockOption) {
       return true;
+    }
+
+    if (typeof playerPlaytime !== "number") {
+      return false;
     }
 
     if (
@@ -982,11 +1006,15 @@ class BlockedLeaderRole extends BlockedRoleAbstract {
   /**
    *
    * @param {object} player
-   * @param {number} playerPlaytime
+   * @param {number | any} playerPlaytime
    */
   isPlayerValid(player, playerPlaytime) {
     if (!this.selectedBlockOption) {
       return true;
+    }
+
+    if (typeof playerPlaytime !== "number") {
+      return false;
     }
 
     if (player.isLeader && this.selectedBlockOption?.minPlayerPlaytime > playerPlaytime) {
@@ -1007,11 +1035,15 @@ class BlockedInfantryRole extends BlockedRoleAbstract {
   /**
    *
    * @param {object} player
-   * @param {number} playerPlaytime
+   * @param {number | any} playerPlaytime
    */
   isPlayerValid(player, playerPlaytime) {
     if (!this.selectedBlockOption) {
       return true;
+    }
+
+    if (typeof playerPlaytime !== "number") {
+      return false;
     }
 
     if (this.selectedBlockOption?.minPlayerPlaytime > playerPlaytime && player.role.match(this.regex)) {

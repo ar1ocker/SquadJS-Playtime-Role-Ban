@@ -138,3 +138,4 @@ dist
 base-plugin.js
 package-lock.json
 package.json
+playtime-service-api.js
