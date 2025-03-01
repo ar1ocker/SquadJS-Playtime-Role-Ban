@@ -28,13 +28,15 @@ Install the y18n library in Squadjs.
 npm install y18n
 ```
 
-- Download the repository Steam Playtime Searcher
+- Download and install Playtime-Service [https://github.com/ar1ocker/Playtime-Service](https://github.com/ar1ocker/Playtime-Service)
+
+- Download the repository Playtime-Service-JS-Lib
 
 ```
-git clone https://github.com/ar1ocker/Steam-Playtime-Searcher
+git clone https://github.com/ar1ocker/Playtime-Service-JS-Lib
 ```
 
-- Copy the `Steam-Playtime-Searcher/playtime-searcher.js` plugin to `squadjs/squad-server/plugins/` folder
+- Copy the `Playtime-Service-JS-Lib/playtime-service-api.js` plugin to `squadjs/squad-server/plugins/` folder
 
 - Download the repository SquadJS Random Patches
 
@@ -100,13 +102,15 @@ If the user has hidden his time in the game - the script will ask to open the pr
 npm install y18n
 ```
 
-- Скачайте репозиторий Steam Playtime Searcher
+- Скачайте и установите [https://github.com/ar1ocker/Playtime-Service](https://github.com/ar1ocker/Playtime-Service)
+
+- Скачайте репозиторий Playtime-Service-JS-Lib
 
 ```
-git clone https://github.com/ar1ocker/Steam-Playtime-Searcher
+git clone https://github.com/ar1ocker/Playtime-Service-JS-Lib
 ```
 
-- Скопируйте `Steam-Playtime-Searcher/playtime-searcher.js` плагин в `squadjs/squad-server/plugins/`
+- Скопируйте `Playtime-Service-JS-Lib/playtime-service-api.js` плагин в папку `squadjs/squad-server/plugins/`
 
 - Скачайте репозиторий SquadJS Random Patches
 
