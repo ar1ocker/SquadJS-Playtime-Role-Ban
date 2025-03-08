@@ -810,31 +810,31 @@ export default class PlaytimeRoleBan extends BasePlugin {
   }
 
   async getPlayerPlaytime(steamID, isNeedUpdate = false) {
-    let playtime;
     try {
-      playtime = await this.playtimeAPI.requestPlaytimeBySteamID(steamID, isNeedUpdate);
+      let playtimeSec = await this.playtimeAPI.getPlayerMaxSecondsPlaytime(steamID, isNeedUpdate);
+
+      if (playtimeSec === TIME_IS_UNKNOWN) {
+        return TIME_IS_UNKNOWN;
+      }
+
+      return playtimeSec / 60 / 60;
     } catch (error) {
       this.verbose(1, this.locale`Failed to get playtime for ${steamID} with error: ${error}`);
       return TIME_IS_UNKNOWN;
     }
-
-    if (playtime.bmPlaytime || playtime.steamPlaytime) {
-      return Math.max(playtime.bmPlaytime, playtime.steamPlaytime) / 60 / 60;
-    }
-
-    return TIME_IS_UNKNOWN;
   }
 
   async getTotalServerPlaytime() {
-    let playtimes = await this.playtimeAPI.requestPlaytimesBySteamIDs(
-      this.server.players.map((player) => player.steamID)
-    );
+    if (this.server.players.length === 0) {
+      return 0;
+    }
 
-    let totalPlaytimeSec = playtimes.reduce((prev, curr) => {
-      return prev + Math.max(curr.bmPlaytime, curr.steamPlaytime);
-    }, 0);
-
-    return totalPlaytimeSec / 60 / 60;
+    try {
+      const playersSteamIDs = this.server.players.map((player) => player.steamID);
+      return (await this.playtimeAPI.getPlayersTotalSecondsPlaytime(playersSteamIDs)) / 60 / 60;
+    } catch (error) {
+      this.verbose(1, this.locale`Failed to get total server playtime with error: ${error}`);
+    }
   }
 
   async warn(playerID, message, repeat = 1, frequency = 5) {
